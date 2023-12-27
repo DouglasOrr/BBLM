@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+
+"""Dev task launcher for BBLM."""
+
+import argparse
+import subprocess
+import sys
+from typing import Any, Callable, Optional, TypeVar
+
+# Helpers
+
+
+def run(*command: Any) -> None:
+    """Run a command, terminating on failure."""
+    cmd = [str(arg) for arg in command if arg is not None]
+    print("$ " + " ".join(cmd), file=sys.stderr)
+    exit_code = subprocess.call(cmd)
+    if exit_code:
+        sys.exit(exit_code)
+
+
+T = TypeVar("T")
+
+
+def cli(*args: Any, **kwargs: Any) -> Callable[[T], T]:
+    """Declare a CLI command / arguments for that command."""
+
+    def wrap(func: T) -> T:
+        if not hasattr(func, "cli_args"):
+            setattr(func, "cli_args", [])
+        if args or kwargs:
+            getattr(func, "cli_args").append((args, kwargs))
+        return func
+
+    return wrap
+
+
+ROOTS = ["dev", "bblm", "tests"]
+
+# Builders
+
+
+@cli("-k", "--filter")
+def tests(filter: Optional[str]) -> None:
+    """run Python tests"""
+    run(
+        "python",
+        "-m",
+        "pytest",
+        "tests",
+        *(["-k", filter] if filter else []),
+    )
+
+
+@cli()
+def lint() -> None:
+    """run static analysis"""
+    run("python", "-m", "flake8", *ROOTS)
+    run("python", "-m", "mypy", *ROOTS)
+
+
+@cli("--check", action="store_true")
+def format(check: bool) -> None:
+    """run autoformatters"""
+    run("black", "--check" if check else None, *ROOTS)
+    run("isort", "--check" if check else None, *ROOTS)
+
+
+@cli()
+def ci() -> None:
+    """run continuous integration checks"""
+    tests(filter=None)
+    lint()
+    format(check=True)
+
+
+# Script
+
+
+def _main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.set_defaults(action=lambda: ci())
+
+    subs = parser.add_subparsers()
+    for key, value in globals().items():
+        if hasattr(value, "cli_args"):
+            sub = subs.add_parser(key.replace("_", "-"), help=value.__doc__)
+            for args, kwargs in value.cli_args:
+                sub.add_argument(*args, **kwargs)
+            sub.set_defaults(action=value)
+
+    cli_args = vars(parser.parse_args())
+    action = cli_args.pop("action")
+    action(**cli_args)
+
+
+if __name__ == "__main__":
+    _main()

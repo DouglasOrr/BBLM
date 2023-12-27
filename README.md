@@ -2,6 +2,15 @@
 
 A PyTorch starter for doing something actually interesting.
 
+## Setup
+
+```sh
+python3 -m venv .venv
+pip install wheel
+# pip install torch --index-url https://download.pytorch.org/whl/cpu   # for CPU
+pip install -r requirements.txt
+```
+
 ## Development
 
 This project follows these principles:
