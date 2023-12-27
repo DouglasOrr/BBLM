@@ -1,2 +1,5 @@
+import bblm
+
+
 def test_placeholder() -> None:
-    pass
+    assert bblm.DUMMY is True
