@@ -24,3 +24,7 @@ pip install -r requirements-dev.txt
 
 ./dev  # run CI checks
 ```
+
+## References
+
+ - WikiText-103 dataset, _[Pointer Sentinel Mixture Models](https://arxiv.org/abs/1609.07843) (2016), Stephen Merity, Caiming Xiong, James Bradbury, and Richard Socher._
