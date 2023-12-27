@@ -41,14 +41,14 @@ ROOTS = ["dev", "bblm", "tests"]
 
 
 @cli("-k", "--filter")
-def tests(filter: Optional[str]) -> None:
+def tests(filter: Optional[str]) -> None:  # pylint:disable=redefined-builtin
     """run Python tests"""
     run(
         "python",
         "-m",
         "pytest",
         "tests",
-        *(["-k", filter] if filter else []),
+        *(["-k", filter] if filter else ["--cov=bblm"]),
     )
 
 
@@ -56,11 +56,19 @@ def tests(filter: Optional[str]) -> None:
 def lint() -> None:
     """run static analysis"""
     run("python", "-m", "flake8", *ROOTS)
+    run("python", "-m", "pylint", *(r for r in ROOTS if r != "tests"))
+    run(
+        "python",
+        "-m",
+        "pylint",
+        "tests",
+        "--disable=missing-module-docstring,missing-function-docstring",
+    )
     run("python", "-m", "mypy", *ROOTS)
 
 
 @cli("--check", action="store_true")
-def format(check: bool) -> None:
+def format(check: bool) -> None:  # pylint:disable=redefined-builtin
     """run autoformatters"""
     run("black", "--check" if check else None, *ROOTS)
     run("isort", "--check" if check else None, *ROOTS)
@@ -79,7 +87,7 @@ def ci() -> None:
 
 def _main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.set_defaults(action=lambda: ci())
+    parser.set_defaults(action=ci)
 
     subs = parser.add_subparsers()
     for key, value in globals().items():
