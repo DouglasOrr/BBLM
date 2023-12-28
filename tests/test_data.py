@@ -16,6 +16,6 @@ def test_data() -> None:
     batch = next(iter(data.batches("valid", 3, 64)))
     assert batch.shape == (3, 64)
     assert batch.dtype == torch.uint8
-    valid_str = (root / "valid.txt").read_text("utf8")
+    valid_str = (root / "valid.txt").read_bytes()
     for sequence in batch:
-        assert bytes(sequence).decode("utf8") in valid_str
+        assert bytes(sequence) in valid_str

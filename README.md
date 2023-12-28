@@ -27,4 +27,5 @@ pip install -r requirements-dev.txt
 
 ## References
 
- - WikiText-103 dataset, _[Pointer Sentinel Mixture Models](https://arxiv.org/abs/1609.07843) (2016), Stephen Merity, Caiming Xiong, James Bradbury, and Richard Socher._
+ - WikiText-103 dataset, _[Pointer Sentinel Mixture Models](https://arxiv.org/abs/1609.07843) (2016), Stephen Merity, Caiming Xiong, James Bradbury, Richard Socher._
+ - Transformer, _[Attention Is All You Need](https://arxiv.org/abs/1706.03762) (2017), Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin._

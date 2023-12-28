@@ -20,7 +20,7 @@ class Data:
     def batches(
         self, part: str, batch_size: int, sequence_length: int
     ) -> Iterable[Tensor]:
-        """Draw batches with replacement."""
+        """Sample an infinite stream of batches (with replacement)."""
         data = self.parts[part]
         while True:
             yield torch.stack(
