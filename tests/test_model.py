@@ -5,7 +5,7 @@ import bblm.model as M
 
 def test_model() -> None:
     model = M.Model(
-        M.ModelSettings(
+        M.Model.Settings(
             hidden_size=32,
             n_heads=5,
             head_size=8,

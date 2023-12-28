@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, Union
+from typing import Dict, Iterable, Optional, Union
 
 import torch
 from torch import Tensor
@@ -18,15 +18,22 @@ class Data:
     parts: Dict[str, Tensor]
 
     def batches(
-        self, part: str, batch_size: int, sequence_length: int
+        self, part: str, batch_size: int, sequence_length: int, seed: Optional[int]
     ) -> Iterable[Tensor]:
         """Sample an infinite stream of batches (with replacement)."""
         data = self.parts[part]
+        generator = torch.Generator()
+        if seed:
+            generator.manual_seed(seed)
+        else:
+            generator.seed()
         while True:
             yield torch.stack(
                 [
                     data[i : i + sequence_length]
-                    for i in torch.randint(len(data) - sequence_length, (batch_size,))
+                    for i in torch.randint(
+                        len(data) - sequence_length, (batch_size,), generator=generator
+                    )
                 ]
             )
 

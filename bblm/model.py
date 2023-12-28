@@ -102,13 +102,13 @@ class Linear(nn.Module):
 
 
 class Model(nn.Module):
-    class Settings(
-        Attention.Settings,
-        FFN.Settings,
-        PreNormResidual.Settings,
-        Protocol,
-    ):
+    @dataclass
+    class Settings(Attention.Settings, FFN.Settings, PreNormResidual.Settings):
         hidden_size: int
+        n_heads: int
+        head_size: int
+        sequence_length: int
+        ffn_size: int
         depth: int
 
     def __init__(self, s: Settings):
@@ -131,13 +131,3 @@ class Model(nn.Module):
         return nn.functional.cross_entropy(
             self.model(indices)[:, :-1, :].flatten(0, -2), indices[:, 1:].flatten()
         )
-
-
-@dataclass
-class ModelSettings:
-    hidden_size: int
-    n_heads: int
-    head_size: int
-    sequence_length: int
-    ffn_size: int
-    depth: int
