@@ -2,7 +2,7 @@ from pathlib import Path
 
 import torch
 
-import bblm.data as D
+import bblm.datasets as D
 
 
 def test_data() -> None:

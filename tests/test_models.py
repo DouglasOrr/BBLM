@@ -1,6 +1,6 @@
 import torch
 
-import bblm.model as M
+import bblm.models as M
 
 
 def test_model() -> None:

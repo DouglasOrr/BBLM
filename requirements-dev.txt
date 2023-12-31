@@ -6,3 +6,4 @@ mypy==1.8.0
 pylint==3.0.3
 pytest==7.4.3
 pytest-cov==4.1.0
+wandb==0.16.1
