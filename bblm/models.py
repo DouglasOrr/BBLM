@@ -129,5 +129,7 @@ class Model(nn.Module):
     def forward(self, indices: Tensor) -> Tensor:
         indices = indices.long()
         return nn.functional.cross_entropy(
-            self.model(indices)[:, :-1, :].flatten(0, -2), indices[:, 1:].flatten()
-        )
+            self.model(indices)[:, :-1, :].flatten(0, -2).float(),
+            indices[:, 1:].flatten(),
+            reduction="none",
+        ).view(indices[:, 1:].shape)

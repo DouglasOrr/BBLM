@@ -35,9 +35,14 @@ def train(
 ) -> Iterable[Dict[str, Any]]:
     """A full training run, lazily yielding a log describing progress."""
 
-    opt = torch.optim.Adam(model.parameters(), lr=s.lr)
-    schedule = torch.optim.lr_scheduler.LinearLR(opt, 1.0, 0.0, total_iters=s.steps)
     (device,) = {p.device for p in model.parameters()}
+    opt = torch.optim.Adam(
+        model.parameters(),
+        lr=s.lr,
+        fused=device.type == "cuda",
+        eps=1e-5,  # increase from default for float16 range
+    )
+    schedule = torch.optim.lr_scheduler.LinearLR(opt, 1.0, 0.0, total_iters=s.steps)
     valid_batches = list(
         islice(
             data.batches("valid", s.batch_size, s.sequence_length, seed=7395223495),
@@ -54,16 +59,16 @@ def train(
             with torch.no_grad():
                 model.eval()
                 valid_loss = torch.stack(
-                    [model(batch.to(device)) for batch in valid_batches]
+                    [model(batch.to(device)).mean() for batch in valid_batches]
                 ).mean()
                 model.train()
             log.update(valid_loss=float(valid_loss))
         if batch is not None:
             opt.zero_grad()
-            loss = model(batch.to(device))
-            loss.backward()
+            losses = model(batch.to(device))
+            losses.backward(torch.ones_like(losses))  # don't down-scale gradients
             opt.step()
-            log.update(loss=float(loss))
+            log.update(loss=float(losses.mean()))
         t = time.time()
         log.update(duration=t - t_last, lr=schedule.get_last_lr()[0])
         yield log
