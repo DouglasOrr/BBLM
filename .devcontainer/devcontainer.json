@@ -1,0 +1,16 @@
+{
+  "image": "pytorch/pytorch",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-toolsai.jupyter"
+      ]
+    }
+  },
+  "runArgs": [
+    "--gpus", "all"
+  ],
+  "postCreateCommand": "pip install -r requirements-dev.txt ipykernel matplotlib pandas seaborn"
+}
