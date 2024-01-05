@@ -24,3 +24,8 @@ def test_model() -> None:
     opt.step()
     loss_1 = model(batch).mean()
     assert loss_1 < loss_0
+
+    # Can generate autoregressive completions
+    completion = model.generate(batch, n=10, temperature=1)
+    assert completion.shape == (batch.shape[0], 10)
+    assert ((0 <= completion) & (completion < 256)).all()  # type:ignore[attr-defined]
